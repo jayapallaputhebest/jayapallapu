@@ -2,140 +2,191 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Jaya Pallapu!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Jaya!</title>
     <style>
+        :root {
+            --gold: #d4af37;
+        }
         body {
             margin: 0;
             overflow: hidden;
-            background: linear-gradient(to bottom, #87CEEB, #E0F7FA); /* Sky to Garden colors */
-            font-family: 'Arial', sans-serif;
-            text-align: center;
+            background: linear-gradient(to bottom, #87CEEB 0%, #f0f9ff 70%, #4CAF50 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* The Button she clicks to start */
-        #start-screen {
+        /* Start Screen */
+        #start-overlay {
             position: fixed;
             inset: 0;
             background: white;
-            z-index: 100;
+            z-index: 999;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        button {
-            padding: 20px 40px;
-            font-size: 20px;
-            cursor: pointer;
+        #start-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
             background: #ff69b4;
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* The Tree & Photo */
-        #garden-container {
-            position: relative;
+        /* The Scene */
+        #scene {
+            display: none;
             height: 100vh;
+            perspective: 1000px;
+        }
+
+        /* The Tree */
+        .trunk {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 0;
+            background: #5d4037;
+            border-radius: 10px 10px 0 0;
+            transition: height 4s ease-in-out;
+            z-index: 2;
+        }
+
+        /* Golden Flowers on the Tree */
+        .tree-flower {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        /* Revolving Name */
+        .name-wrapper {
+            position: absolute;
+            bottom: 350px;
+            width: 100%;
+            transform-style: preserve-3d;
+            animation: rotateName 8s linear infinite;
             display: none;
         }
 
-        .tree {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 0;
-            background: #8B4513; /* Trunk color */
-            transition: height 3s ease-out;
+        .name-wrapper h1 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 0;
         }
 
-        .photo-emerge {
-            width: 150px;
-            border-radius: 50%;
-            border: 5px solid gold;
-            position: absolute;
-            bottom: 300px;
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            transition: transform 2s 3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Revolving Text */
-        .revolving-text {
-            position: absolute;
-            bottom: 400px;
-            width: 100%;
-            animation: rotateText 10s linear infinite;
-            font-weight: bold;
-            color: #d4af37; /* Gold */
-        }
-
-        @keyframes rotateText {
+        @keyframes rotateName {
             from { transform: rotateY(0deg); }
             to { transform: rotateY(360deg); }
         }
 
         /* Falling Flowers */
-        .flower {
+        .rain-flower {
             position: absolute;
             top: -50px;
-            font-size: 24px;
             animation: fall linear forwards;
+            z-index: 1;
         }
 
         @keyframes fall {
             to { transform: translateY(110vh) rotate(360deg); }
         }
+
+        /* Birds */
+        .bird {
+            position: absolute;
+            font-size: 20px;
+            animation: fly 15s linear infinite;
+            top: 15%;
+            opacity: 0.7;
+        }
+
+        @keyframes fly {
+            from { left: -50px; }
+            to { left: 110vw; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <button onclick="startCelebration()">Open Jaya's Birthday Card 🌸</button>
+    <div id="start-overlay">
+        <button id="start-button" onclick="celebrate()">Tap to Open Jaya's Gift 🎁</button>
     </div>
 
-    <div id="garden-container">
-        <div class="tree" id="birthdayTree"></div>
-        <img src="jaya-photo.jpg" class="photo-emerge" id="jayaPhoto">
-        
-        <div class="revolving-text">
-            <h2>HAPPY BIRTHDAY JAYA PALLAPU</h2>
+    <div id="scene">
+        <div class="bird" style="animation-delay: 0s;">🐦 Happy Birthday</div>
+        <div class="bird" style="top: 25%; animation-delay: 5s;">🐦 Jaya!</div>
+
+        <div class="trunk" id="trunk">
+            </div>
+
+        <div class="name-wrapper" id="nameTag">
+            <h1>Jaya Pallapu</h1>
         </div>
 
         <audio id="bdaySong" src="suno-song.mp3"></audio>
     </div>
 
     <script>
-        function startCelebration() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('garden-container').style.display = 'block';
+        function celebrate() {
+            document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('scene').style.display = 'block';
             
-            // Start Music
-            document.getElementById('bdaySong').play();
+            const song = document.getElementById('bdaySong');
+            song.play();
 
-            // Grow Tree
+            // 1. Grow Trunk
+            const trunk = document.getElementById('trunk');
             setTimeout(() => {
-                document.getElementById('birthdayTree').style.height = '300px';
-                document.getElementById('jayaPhoto').style.transform = 'translateX(-50%) scale(1)';
-            }, 500);
+                trunk.style.height = '250px';
+            }, 100);
 
-            // Create 100 Flowers
+            // 2. Rain 100 Flowers
             for (let i = 0; i < 100; i++) {
-                createFlower();
+                setTimeout(createRainFlower, i * 50);
             }
+
+            // 3. Bloom tree flowers & Show Name
+            setTimeout(() => {
+                bloomTree();
+                document.getElementById('nameTag').style.display = 'block';
+            }, 3500);
         }
 
-        function createFlower() {
+        function createRainFlower() {
             const flower = document.createElement('div');
-            flower.className = 'flower';
-            flower.innerHTML = '🌸'; // You can mix emojis like 🌺, 🌼
+            const types = ['🌸', '🌺', '🌼', '🌷'];
+            flower.className = 'rain-flower';
+            flower.innerHTML = types[Math.floor(Math.random() * types.length)];
             flower.style.left = Math.random() * 100 + 'vw';
-            flower.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            flower.style.animationDelay = Math.random() * 5 + 's';
+            flower.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            flower.style.animationDuration = (Math.random() * 3 + 4) + 's';
             document.body.appendChild(flower);
+            
+            // Cleanup
+            setTimeout(() => flower.remove(), 8000);
+        }
+
+        function bloomTree() {
+            const trunk = document.getElementById('trunk');
+            for (let i = 0; i < 15; i++) {
+                const f = document.createElement('div');
+                f.className = 'tree-flower';
+                f.innerHTML = '✨'; // Gold sparkles/flowers
+                f.style.left = (Math.random() * 60 - 30) + 'px';
+                f.style.top = (Math.random() * 50 - 20) + 'px';
+                trunk.appendChild(f);
+                setTimeout(() => f.style.opacity = '1', i * 100);
+            }
         }
     </script>
 </body>
