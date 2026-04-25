@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Jaya Pallapu!</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA); /* Sky to Garden colors */
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        /* The Button she clicks to start */
+        #start-screen {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            padding: 20px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            background: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 50px;
+        }
+
+        /* The Tree & Photo */
+        #garden-container {
+            position: relative;
+            height: 100vh;
+            display: none;
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 0;
+            background: #8B4513; /* Trunk color */
+            transition: height 3s ease-out;
+        }
+
+        .photo-emerge {
+            width: 150px;
+            border-radius: 50%;
+            border: 5px solid gold;
+            position: absolute;
+            bottom: 300px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            transition: transform 2s 3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Revolving Text */
+        .revolving-text {
+            position: absolute;
+            bottom: 400px;
+            width: 100%;
+            animation: rotateText 10s linear infinite;
+            font-weight: bold;
+            color: #d4af37; /* Gold */
+        }
+
+        @keyframes rotateText {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /* Falling Flowers */
+        .flower {
+            position: absolute;
+            top: -50px;
+            font-size: 24px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <button onclick="startCelebration()">Open Jaya's Birthday Card 🌸</button>
+    </div>
+
+    <div id="garden-container">
+        <div class="tree" id="birthdayTree"></div>
+        <img src="jaya-photo.jpg" class="photo-emerge" id="jayaPhoto">
+        
+        <div class="revolving-text">
+            <h2>HAPPY BIRTHDAY JAYA PALLAPU</h2>
+        </div>
+
+        <audio id="bdaySong" src="suno-song.mp3"></audio>
+    </div>
+
+    <script>
+        function startCelebration() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('garden-container').style.display = 'block';
+            
+            // Start Music
+            document.getElementById('bdaySong').play();
+
+            // Grow Tree
+            setTimeout(() => {
+                document.getElementById('birthdayTree').style.height = '300px';
+                document.getElementById('jayaPhoto').style.transform = 'translateX(-50%) scale(1)';
+            }, 500);
+
+            // Create 100 Flowers
+            for (let i = 0; i < 100; i++) {
+                createFlower();
+            }
+        }
+
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.innerHTML = '🌸'; // You can mix emojis like 🌺, 🌼
+            flower.style.left = Math.random() * 100 + 'vw';
+            flower.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            flower.style.animationDelay = Math.random() * 5 + 's';
+            document.body.appendChild(flower);
+        }
+    </script>
+</body>
+</html>
